@@ -1,33 +1,30 @@
-# Start with a base image
-FROM golang:1.22 AS builder
+# Start from the official golang image
+FROM golang:latest
 
-# Set the working directory inside the container
+# Set the Current Working Directory inside the container
 WORKDIR /app
 
-# Copy the Go module dependency files
-COPY go.mod .
-COPY go.sum .
+# Copy go mod and sum files
+COPY go.mod go.sum ./
 
-# Download Go module dependencies
+# Download all dependencies. Dependencies will be cached if the go.mod and go.sum files are not changed
 RUN go mod download
 
-# Copy the rest of the application source code
+# Copy the source code into the container
 COPY . .
 
-# Build the Go application
-RUN go build -o main.exe ./cmd/main.go
+# Change directory to where your main.go is located
+WORKDIR /app/cmd
 
-# Start a new stage for the final lightweight container
-FROM alpine:latest
+# Build the Go app
+RUN go build -o /app/main .
 
-# Set the working directory inside the container
+# Set back the working directory
 WORKDIR /app
 
-# Copy the compiled binary from the builder stage
-COPY --from=builder /app main.exe
+# Add wait-for-it script
+ADD https://github.com/vishnubob/wait-for-it/raw/master/wait-for-it.sh /app/wait-for-it.sh
+RUN chmod +x /app/wait-for-it.sh
 
-# Set execute permission for the binary
-RUN chmod +x ./main.exe
-
-# Set the command to run the binary
-CMD ["./main.exe"]
+# Command to run the executable
+CMD ["./wait-for-it.sh", "mongo:27017", "--", "./main"]
