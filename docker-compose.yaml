@@ -1,0 +1,22 @@
+version: '3'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    ports:
+      - 8080:8080
+    volumes:
+      - ./cmd:/app/cmd
+      - ./pkg:/app/pkg
+    depends_on:
+      - database
+
+  database:
+    image: mongo
+    ports:
+      - 27017:27017
+    volumes:
+      - mongo-data:
+
