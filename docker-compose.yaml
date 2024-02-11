@@ -6,17 +6,13 @@ services:
       context: .
       dockerfile: docker/Dockerfile
     ports:
-      - 8080:8080
-    volumes:
-      - ./cmd:/app/cmd
-      - ./pkg:/app/pkg
+      - "8080:8080"
+    environment:
+      MONGO_URI: "mongodb://mongo:27017/mydatabase"
     depends_on:
-      - database
+      - mongo
 
-  database:
-    image: mongo
+  mongo:
+    image: mongo:latest
     ports:
-      - 27017:27017
-    volumes:
-      - mongo-data:
-
+      - "27017:27017"

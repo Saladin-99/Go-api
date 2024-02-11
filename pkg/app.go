@@ -1,6 +1,8 @@
 package pkg
 
 import (
+	"fmt"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -20,6 +22,4 @@ func (app *App) Run(addr string) error {
 		return fmt.Errorf("failed to run application: %w", err)
 	}
 	return nil
-}
-
 }
